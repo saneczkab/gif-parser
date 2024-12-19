@@ -12,6 +12,7 @@ def get_descriptor(parser):
         result += f"{parser.global_color_table}\n"
     return result
 
+
 def print_all_frames_headers(parser):
     result = f"{get_descriptor(parser)}\n"
     for i, frame in enumerate(parser.frames, start=1):
@@ -26,6 +27,7 @@ def print_all_frames_headers(parser):
             result += f"{frame.comment_ext}\n"
         result += f"{frame}\n"
     return result
+
 
 def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s:\n%(message)s")
@@ -48,7 +50,8 @@ def main():
 
     if args.animate and gif_parser.frames:
         root = tk.Tk()
-        GifViewer(root, gif_parser)
+        viewer = GifViewer(root, gif_parser)
+        viewer.animate()
         root.mainloop()
 
 

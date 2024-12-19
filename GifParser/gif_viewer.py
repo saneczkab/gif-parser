@@ -1,5 +1,4 @@
 from GifParser.parser import GifParser
-
 import tkinter as tk
 
 
@@ -26,8 +25,6 @@ class GifViewer:
         self.base_image = [row.copy() for row in self.checkerboard]
         self.previous_images_stack = []
 
-        self.animate()
-
     @staticmethod
     def create_checkerboard(width, height, tile_size=10):
         color1 = "#C8C8C8"
@@ -45,6 +42,12 @@ class GifViewer:
 
     def animate(self):
         if not self.gif_parser.frames:
+            return
+
+        if len(self.gif_parser.frames) == 1:
+            frame = self.gif_parser.frames[0]
+            self.apply_frame(frame)
+            self.update_photo()
             return
 
         frame = self.gif_parser.frames[self.current_frame]
@@ -74,7 +77,6 @@ class GifViewer:
             self.previous_images_stack.append([row.copy() for row in self.base_image])
 
         self.apply_frame(frame)
-
         self.update_photo()
 
         self.current_frame = (self.current_frame + 1) % len(self.gif_parser.frames)
