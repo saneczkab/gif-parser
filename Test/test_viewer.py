@@ -92,3 +92,6 @@ class TestGifViewer(unittest.TestCase):
         self.assertEqual(1, len(viewer.base_image))
         self.assertEqual(1, len(viewer.base_image[0]))
         self.assertEqual("#B80000", viewer.base_image[0][0])
+
+if __name__ == '__main__':
+    unittest.main()
