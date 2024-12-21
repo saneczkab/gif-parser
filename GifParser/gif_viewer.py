@@ -70,10 +70,9 @@ class GifViewer:
         self._apply_frame(frame)
         self._update_photo()
 
-        if self.current_frame_idx == len(self.gif_parser.frames) - 1:
-            self._clear_region(frame.image_descriptor)
-
         if len(self.gif_parser.frames) > 1:
+            if self.current_frame_idx == len(self.gif_parser.frames) - 1:
+                self._clear_image(frame.image_descriptor)
             self.current_frame_idx = (self.current_frame_idx + 1) % len(self.gif_parser.frames)
             self.root.after(delay, self.animate)
 
@@ -104,34 +103,30 @@ class GifViewer:
         ]
 
     def _process_disposal(self):
+        """
+        Применение метода обработки кадра.
+        """
         frame = self.gif_parser.frames[self.current_frame_idx]
         disposal = frame.graphic_control_extension.disposal_method if frame.graphic_control_extension else 0
 
         if self.current_frame_idx > 0:
             prev_frame = self.gif_parser.frames[self.current_frame_idx - 1]
-            self._handle_disposal(prev_frame)
+            prev_disposal = (
+                prev_frame.graphic_control_extension.disposal_method
+                if prev_frame.graphic_control_extension else 0
+            )
+
+            if prev_disposal == 2:
+                self._clear_image(prev_frame.image_descriptor)
+            elif prev_disposal == 3 and self.previous_images_stack:
+                self.base_image = self.previous_images_stack.pop()
 
         if disposal == 3:
             self.previous_images_stack.append([row.copy() for row in self.base_image])
 
-    def _handle_disposal(self, prev_frame):
+    def _clear_image(self, descriptor):
         """
-        Применение метода обработки кадра.
-        :param prev_frame: Предыдущий кадр.
-        """
-        prev_disposal = (
-            prev_frame.graphic_control_extension.disposal_method
-            if prev_frame.graphic_control_extension else 0
-        )
-
-        if prev_disposal == 2:
-            self._clear_region(prev_frame.image_descriptor)
-        elif prev_disposal == 3 and self.previous_images_stack:
-            self.base_image = self.previous_images_stack.pop()
-
-    def _clear_region(self, descriptor):
-        """
-        Очистка области изображения.
+        Очистка изображения.
         :param descriptor: Логический дескриптор экрана.
         """
         left, top, width, height = descriptor.left, descriptor.top, descriptor.width, descriptor.height
