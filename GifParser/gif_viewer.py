@@ -6,137 +6,173 @@ class GifViewer:
     def __init__(self, root, gif_parser: GifParser):
         self.root = root
         self.gif_parser = gif_parser
-        self.label = tk.Label(root)
-        self.label.pack()
-        self.current_frame = 0
+        self.current_frame_idx = 0
 
         self.width = gif_parser.logical_screen_descriptor.width
         self.height = gif_parser.logical_screen_descriptor.height
-        self.tile_size = 10
 
-        self.checkerboard = self.create_checkerboard(self.width, self.height, self.tile_size)
-
-        self.photo = tk.PhotoImage(width=self.width, height=self.height)
-        self.label.config(image=self.photo)
-
-        rows_str = ["{" + " ".join(row) + "}" for row in self.checkerboard]
-        self.photo.put("\n".join(rows_str))
-
+        self.checkerboard = self._create_checkerboard(self.width, self.height)
+        self._configure_root_window(root)
+        self._create_ui_components()
         self.base_image = [row.copy() for row in self.checkerboard]
         self.previous_images_stack = []
 
-    @staticmethod
-    def create_checkerboard(width, height, tile_size=10):
-        color1 = "#C8C8C8"
-        color2 = "#646464"
-        checkerboard = []
-        for y in range(height):
-            row = []
-            for x in range(width):
-                if ((x // tile_size) + (y // tile_size)) % 2 == 0:
-                    row.append(color1)
-                else:
-                    row.append(color2)
-            checkerboard.append(row)
-        return checkerboard
+    def _configure_root_window(self, root):
+        """
+        Настройка конфигурации окна tkinter.
+        :param root: Окно tkinter.
+        """
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+        window_width, window_height = self._calculate_window_size(screen_width, screen_height)
+        root.geometry(f"{window_width}x{window_height}")
+
+    def _create_ui_components(self):
+        """
+        Инициализация компонентов пользовательского интерфейса.
+        """
+        frame = tk.Frame(self.root)
+        frame.pack(fill=tk.BOTH, expand=True)
+
+        frame.rowconfigure(0, weight=1)
+        frame.columnconfigure(0, weight=1)
+
+        self.canvas = tk.Canvas(frame)
+        self.canvas.grid(row=0, column=0, sticky="nsew")
+
+        self._add_scrollbars(frame)
+
+        self.photo = tk.PhotoImage(width=self.width, height=self.height)
+        self.image_id = self.canvas.create_image(0, 0, anchor="nw", image=self.photo)
+        self.canvas.config(scrollregion=(0, 0, self.width, self.height))
+
+    def _add_scrollbars(self, frame):
+        """
+        Добавление скроллбаров для окна tkinter.
+        :param frame: Кадр.
+        """
+        v_scroll = tk.Scrollbar(frame, orient=tk.VERTICAL, command=self.canvas.yview)
+        v_scroll.grid(row=0, column=1, sticky="ns")
+        self.canvas.configure(yscrollcommand=v_scroll.set)
+
+        h_scroll = tk.Scrollbar(frame, orient=tk.HORIZONTAL, command=self.canvas.xview)
+        h_scroll.grid(row=1, column=0, sticky="ew")
+        self.canvas.configure(xscrollcommand=h_scroll.set)
 
     def animate(self):
-        if not self.gif_parser.frames:
-            return
+        """
+        Анимация GIF-изображения.
+        """
+        frame = self.gif_parser.frames[self.current_frame_idx]
+        delay = frame.graphic_control_extension.delay_time if frame.graphic_control_extension else 100
 
-        if len(self.gif_parser.frames) == 1:
-            frame = self.gif_parser.frames[0]
-            self.apply_frame(frame)
-            self.update_photo()
-            return
+        self._process_disposal()
+        self._apply_frame(frame)
+        self._update_photo()
 
-        frame = self.gif_parser.frames[self.current_frame]
-        delay = (
-            frame.graphic_control_extension.delay_time / 100.0
-            if frame.graphic_control_extension else 0.1
-        )
-        disposal = (
-            frame.graphic_control_extension.disposal_method
-            if frame.graphic_control_extension else 0
-        )
+        if self.current_frame_idx == len(self.gif_parser.frames) - 1:
+            self._clear_region(frame.image_descriptor)
 
-        if self.current_frame > 0:
-            prev_frame = self.gif_parser.frames[self.current_frame - 1]
-            prev_disposal = (
-                prev_frame.graphic_control_extension.disposal_method
-                if prev_frame.graphic_control_extension else 0
-            )
-            if prev_disposal == 2:
-                self.clear_region(prev_frame.image_descriptor)
-            elif prev_disposal == 3:
-                if self.previous_images_stack:
-                    self.base_image = self.previous_images_stack.pop()
-                    self.update_photo()
+        if len(self.gif_parser.frames) > 1:
+            self.current_frame_idx = (self.current_frame_idx + 1) % len(self.gif_parser.frames)
+            self.root.after(delay, self.animate)
+
+    def _calculate_window_size(self, screen_width, screen_height):
+        """
+        Вычисление размера окна tkinter.
+        :param screen_width: Ширина экрана пользователя.
+        :param screen_height: Высота экрана пользователя.
+        :return: Ширина и высота окна tkinter.
+        """
+        scrollbar_width = 21
+        scrollbar_height = 21
+        window_width = min(self.width + scrollbar_width, screen_width)
+        window_height = min(self.height + scrollbar_height, screen_height)
+        return window_width, window_height
+
+    def _create_checkerboard(self, width, height):
+        """
+        Создание шахматки.
+        :param width: Ширина окна.
+        :param height: Высота окна.
+        :return: Список списков - цвета шахматки.
+        """
+        color1, color2 = "#C8C8C8", "#646464"
+        return [
+            [color1 if (x // 10 + y // 10) % 2 == 0 else color2 for x in range(width)]
+            for y in range(height)
+        ]
+
+    def _process_disposal(self):
+        frame = self.gif_parser.frames[self.current_frame_idx]
+        disposal = frame.graphic_control_extension.disposal_method if frame.graphic_control_extension else 0
+
+        if self.current_frame_idx > 0:
+            prev_frame = self.gif_parser.frames[self.current_frame_idx - 1]
+            self._handle_disposal(prev_frame)
 
         if disposal == 3:
             self.previous_images_stack.append([row.copy() for row in self.base_image])
 
-        self.apply_frame(frame)
-        self.update_photo()
+    def _handle_disposal(self, prev_frame):
+        """
+        Применение метода обработки кадра.
+        :param prev_frame: Предыдущий кадр.
+        """
+        prev_disposal = (
+            prev_frame.graphic_control_extension.disposal_method
+            if prev_frame.graphic_control_extension else 0
+        )
 
-        self.current_frame = (self.current_frame + 1) % len(self.gif_parser.frames)
-        self.root.after(int(delay * 10), self.animate)
+        if prev_disposal == 2:
+            self._clear_region(prev_frame.image_descriptor)
+        elif prev_disposal == 3 and self.previous_images_stack:
+            self.base_image = self.previous_images_stack.pop()
 
-    def clear_region(self, image_descriptor):
-        left = image_descriptor.left
-        top = image_descriptor.top
-        width = image_descriptor.width
-        height = image_descriptor.height
-
+    def _clear_region(self, descriptor):
+        """
+        Очистка области изображения.
+        :param descriptor: Логический дескриптор экрана.
+        """
+        left, top, width, height = descriptor.left, descriptor.top, descriptor.width, descriptor.height
         for y in range(top, top + height):
-            if y >= self.height:
-                continue
             for x in range(left, left + width):
-                if x >= self.width:
-                    continue
-                tile_x = x // self.tile_size
-                tile_y = y // self.tile_size
+                tile_x, tile_y = x // 10, y // 10
                 color = "#C8C8C8" if (tile_x + tile_y) % 2 == 0 else "#646464"
                 self.base_image[y][x] = color
 
-    def apply_frame(self, frame):
-        left = frame.image_descriptor.left
-        top = frame.image_descriptor.top
-        width = frame.image_descriptor.width
-        height = frame.image_descriptor.height
+    def _apply_frame(self, frame):
+        """
+        Подстановка кадра в изображение.
+        :param frame: Кадр.
+        """
+        descriptor = frame.image_descriptor
+        left, top, width, height = descriptor.left, descriptor.top, descriptor.width, descriptor.height
+
         color_table = (
             frame.local_color_table.colors
-            if frame.local_color_table else
-            self.gif_parser.global_color_table.colors
+            if frame.local_color_table else self.gif_parser.global_color_table.colors
         )
-        transparent_index = (
+
+        transparent_idx = (
             frame.graphic_control_extension.transparent_color_index
-            if frame.graphic_control_extension and frame.graphic_control_extension.transparency_flag else
-            None
+            if frame.graphic_control_extension and frame.graphic_control_extension.transparency_flag
+            else None
         )
 
         for y in range(height):
-            if (top + y) >= self.height:
-                continue
             for x in range(width):
-                if (left + x) >= self.width:
-                    continue
                 idx = y * width + x
-                if idx >= len(frame.image_data):
-                    continue
                 color_idx = frame.image_data[idx]
-                if color_idx >= len(color_table):
-                    continue
-                if transparent_index is not None and color_idx == transparent_index:
+                if transparent_idx is not None and color_idx == transparent_idx:
                     continue
                 rgb = color_table[color_idx]
-                color = self.rgb_to_hex(rgb)
+                color = f"#{rgb[0]:02X}{rgb[1]:02X}{rgb[2]:02X}"
                 self.base_image[top + y][left + x] = color
 
-    def update_photo(self):
+    def _update_photo(self):
+        """
+        Обновление canvas-изображения.
+        """
         rows_str = ["{" + " ".join(row) + "}" for row in self.base_image]
         self.photo.put("\n".join(rows_str))
-
-    @staticmethod
-    def rgb_to_hex(rgb):
-        return f'#{rgb[0]:02X}{rgb[1]:02X}{rgb[2]:02X}'
