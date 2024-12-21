@@ -1,19 +1,14 @@
 import argparse
 import unittest
-from unittest.mock import patch, MagicMock
-import sys
-import io
+from unittest.mock import patch
 
 from GifParser.parser import GifParser
 from GifStructs.GifExtensions.application_extension import GifApplicationExtension
 from GifStructs.GifExtensions.comment_extension import GifCommentExtension
 from GifStructs.GifExtensions.graphic_control_extension import GifGraphicControlExtension
 from GifStructs.GifExtensions.plain_text_extension import GifPlainTextExtension
-from GifStructs.gif_frame import GifFrame
 from GifStructs.gif_header import GifHeader
 from GifStructs.global_color_table import GifGlobalColorTable
-from GifStructs.image_descriptor import GifImageDescriptor
-from GifStructs.local_color_table import GifLocalColorTable
 from GifStructs.logical_screen_descriptor import GifLogicalScreenDescriptor
 from gif_parser import main
 
@@ -47,8 +42,8 @@ class TestGifParser(unittest.TestCase):
             b"\x4E\x45\x54\x53\x43\x41\x50\x45\x32\x2E\x30\x03", b"\x01\x00\x00")
         self.assertEqual(expected, app_ext)
 
-    def text_parse_comment_extension(self):
-        expected = GifCommentExtension(b"comment")
+    def test_parse_comment_extension(self):
+        expected = GifCommentExtension("test comment")
         comment_ext = GifParser.parse_comment_extension(b"\x74\x65\x73\x74\x20\x63\x6F\x6D\x6D\x65\x6E\x74")
         self.assertEqual(expected, comment_ext)
 
