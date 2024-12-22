@@ -2,7 +2,7 @@ import unittest
 import tkinter as tk
 
 from GifParser.gif_viewer import GifViewer
-from GifParser.parser import GifParser
+from GifParser.gif_parser import GifParser
 
 
 class TestGifViewer(unittest.TestCase):

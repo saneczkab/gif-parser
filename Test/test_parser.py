@@ -2,7 +2,7 @@ import argparse
 import unittest
 from unittest.mock import patch
 
-from GifParser.parser import GifParser
+from GifParser.gif_parser import GifParser
 from GifStructs.GifExtensions.application_extension import GifApplicationExtension
 from GifStructs.GifExtensions.comment_extension import GifCommentExtension
 from GifStructs.GifExtensions.graphic_control_extension import GifGraphicControlExtension
@@ -10,7 +10,7 @@ from GifStructs.GifExtensions.plain_text_extension import GifPlainTextExtension
 from GifStructs.gif_header import GifHeader
 from GifStructs.global_color_table import GifGlobalColorTable
 from GifStructs.logical_screen_descriptor import GifLogicalScreenDescriptor
-from gif_parser import main
+from gif_parser_interface import main
 
 
 class TestGifParser(unittest.TestCase):

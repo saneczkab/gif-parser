@@ -1,4 +1,4 @@
-from GifParser.parser import GifParser
+from GifParser.gif_parser import GifParser
 import tkinter as tk
 
 
