@@ -33,9 +33,9 @@ def main():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s:\n%(message)s")
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="Путь к GIF-файлу")
-    parser.add_argument("--descriptor", action="store_true", help="Показать дескриптор экрана")
-    parser.add_argument("--headers", action="store_true", help="Показать заголовки для каждого кадра")
-    parser.add_argument("--animate", action="store_true", help="Показать изображение/анимацию")
+    parser.add_argument("--descriptor", "-d", action="store_true", help="Показать дескриптор экрана")
+    parser.add_argument("--headers", "-H", action="store_true", help="Показать заголовки для каждого кадра")
+    parser.add_argument("--animate", "-a", action="store_true", help="Показать изображение/анимацию")
     args = parser.parse_args()
     filepath = args.input
 
