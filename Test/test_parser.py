@@ -56,6 +56,33 @@ class TestGifParser(unittest.TestCase):
 
     @patch('argparse.ArgumentParser.parse_args')
     @patch('logging.info')
+    def test_descriptor(self, mock_logging_info, mock_parse_args):
+        mock_parse_args.return_value = argparse.Namespace(
+            input='Images/small.gif',
+            descriptor=True,
+            headers=False,
+            animate=False
+        )
+
+        main()
+        all_output = mock_logging_info.call_args[0]
+        self.assertEqual(1, len(all_output))
+        output = all_output[0]
+        expected = ("Заголовок: GIF89a\n"
+                    "Логический дескриптор экрана:\n"
+                    "  Ширина: 1 px\n"
+                    "  Высота: 1 px\n"
+                    "  Флаг использования глобальной таблицы цветов: 1\n"
+                    "  Флаг сортировки: 0\n"
+                    "  Размер общей таблицы цветов: 4\n"
+                    "  Индекс цвета фона: 0\n"
+                    "  Соотношение сторон: 0\n"
+                    "Глобальная таблица цветов:\n"
+                    "  Число цветов: 4\n")
+        self.assertEqual(expected, output)
+
+    @patch('argparse.ArgumentParser.parse_args')
+    @patch('logging.info')
     def test_parse_small_gif(self, mock_logging_info, mock_parse_args):
         mock_parse_args.return_value = argparse.Namespace(
             input='Images/small.gif',
@@ -105,34 +132,6 @@ class TestGifParser(unittest.TestCase):
         self.assertEqual(1, output.count("Нет расширения простого текста"))
         self.assertEqual(1, output.count("Нет расширения приложения"))
         self.assertEqual(1, output.count("Есть расширение комментария"))
-
-    @patch('argparse.ArgumentParser.parse_args')
-    @patch('logging.info')
-    def test_big_gif_descriptor(self, mock_logging_info, mock_parse_args):
-        mock_parse_args.return_value = argparse.Namespace(
-            input='Images/big_image.gif',
-            descriptor=True,
-            headers=False,
-            animate=False
-        )
-
-        main()
-        all_output = mock_logging_info.call_args[0]
-        self.assertEqual(1, len(all_output))
-        output = all_output[0]
-        expected = ("Заголовок: GIF87a\n"
-                    "Логический дескриптор экрана:\n"
-                    "  Ширина: 4000 px\n"
-                    "  Высота: 2662 px\n"
-                    "  Флаг использования глобальной таблицы цветов: 1\n"
-                    "  Флаг Color resolution: 7\n"
-                    "  Флаг сортировки: 0\n"
-                    "  Размер общей таблицы цветов: 256\n"
-                    "  Индекс цвета фона: 243\n"
-                    "  Соотношение сторон: 0\n"
-                    "Глобальная таблица цветов:\n"
-                    "  Число цветов: 256\n")
-        self.assertEqual(expected, output)
 
 
 if __name__ == '__main__':

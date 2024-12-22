@@ -11,10 +11,6 @@ class GifLogicalScreenDescriptor:
         return (self.packed & 0x80) >> 7
 
     @property
-    def color_resolution(self):
-        return ((self.packed & 0x70) >> 4) + 1
-
-    @property
     def sort_flag(self):
         return (self.packed & 0x08) >> 3
 
@@ -28,7 +24,6 @@ class GifLogicalScreenDescriptor:
                 f"  Ширина: {self.width} px\n"
                 f"  Высота: {self.height} px\n"
                 f"  Флаг использования глобальной таблицы цветов: {self.global_color_table_flag}\n"
-                f"  Флаг Color resolution: {self.color_resolution}\n"
                 f"  Флаг сортировки: {self.sort_flag}\n"
                 f"  Размер общей таблицы цветов: {self.global_color_table_size}\n"
                 f"  Индекс цвета фона: {self.bg_color_index}\n"
