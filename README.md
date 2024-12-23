@@ -14,32 +14,29 @@ CLI приложение, позволяющее просматривать за
 - Просмотр основной информации о GIF-файле (без информации для каждого кадра)
   
 
-- Команда `--descriptor input`:  
-    - `input` - путь к файлу.
+- Команда `--descriptor, -d`
   
 
 - Пример:  
-  - `python gif_parser_interface.py --descriptor example\file.gif`  
+  - `python gif_parser_interface.py -d Test\Images\image.gif`  
   
 ## Просмотр заголовков
 - Просмотр основной информации о gif-файле, а также информации о загловках для каждого кадра анимации.  
   
 
-- Команда `--headers input`:  
-    - `input` - путь к файлу.    
+- Команда `--headers, -H`  
   
 
 - Пример:  
-    - `python gif_parser_interface.py --headers example\file.gif`  
+    - `python gif_parser_interface.py -H Test\Images\image.gif`  
   
 ## Просмотр анимации  
 - Покадровая отрисовка анимации.  
   
 
-- Команда `--animate input`:  
-    - `input` - путь к файлу.  
+- Команда `--animate, -a`
   
 
 - Пример:  
-    - `python gif_parser_interface.py --animate example\file.gif`  
+    - `python gif_parser_interface.py -a Test\Images\image.gif`  
  
