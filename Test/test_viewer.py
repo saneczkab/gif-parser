@@ -1,5 +1,6 @@
 import unittest
 import tkinter as tk
+from unittest.mock import patch
 
 from GifParser.gif_viewer import GifViewer
 from GifParser.gif_parser import GifParser
@@ -92,6 +93,22 @@ class TestGifViewer(unittest.TestCase):
         self.assertEqual(1, len(viewer.base_image))
         self.assertEqual(1, len(viewer.base_image[0]))
         self.assertEqual("#B80000", viewer.base_image[0][0])
+
+    @patch.object(GifViewer, '_process_disposal')
+    @patch.object(GifViewer, '_apply_frame')
+    @patch.object(GifViewer, '_update_photo')
+    @patch.object(GifViewer, '_clear_image')
+    def test_animate(self, mock_clear_image, mock_update_photo, mock_apply_frame, mock_process_disposal):
+        parser = GifParser("Images/small.gif")
+        parser.parse()
+        viewer = GifViewer(self.root, parser)
+        viewer.animate()
+
+        self.assertEqual(1, viewer.current_frame_idx)
+        mock_process_disposal.assert_called_once()
+        mock_apply_frame.assert_called_once()
+        mock_update_photo.assert_called_once()
+        mock_clear_image.assert_not_called()
 
 if __name__ == '__main__':
     unittest.main()

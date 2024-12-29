@@ -61,7 +61,8 @@ class TestGifParser(unittest.TestCase):
             input='Images/small.gif',
             descriptor=True,
             headers=False,
-            animate=False
+            animate=False,
+            export=None
         )
 
         main()
@@ -88,7 +89,8 @@ class TestGifParser(unittest.TestCase):
             input='Images/small.gif',
             descriptor=False,
             headers=True,
-            animate=False
+            animate=False,
+            export=None
         )
 
         main()
@@ -115,7 +117,8 @@ class TestGifParser(unittest.TestCase):
             input='Images/image.gif',
             descriptor=False,
             headers=True,
-            animate=False
+            animate=False,
+            export=None
         )
 
         main()
