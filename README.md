@@ -38,5 +38,17 @@ CLI приложение, позволяющее просматривать за
   
 
 - Пример:  
-    - `python gif_parser_interface.py -a Test\Images\image.gif`  
+    - `python gif_parser_interface.py -a Test\Images\image.gif`
+ 
+## Экспорт кадров (всех или выбранных) в отдельные файлы  
+- Экспорт кадров в отдельные файлы. При вводе команды кадры анимации будут экспортированы в файлы формата png.
+  
+
+- Команда `--export, -e [frames]`
+  - `frames` - кадры для экспорта из анимации - числа, введённые через пробел. Если не ввести ничего, будут экспортированы все кадры.
+  
+
+- Пример:  
+    - `python gif_parser_interface.py -e Test\Images\transparent.gif` - экспорт всех кадров,
+    - `python gif_parser_interface.py -e 1 2 5 Test\Images\transparent.gif` - экспорт кадров 1, 2 и 5.
  
