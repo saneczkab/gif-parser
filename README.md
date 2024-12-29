@@ -18,7 +18,7 @@ CLI приложение, позволяющее просматривать за
   
 
 - Пример:  
-  - `python gif_parser_interface.py -d Test\Images\image.gif`  
+  - `python gif_parser_interface.py Test\Images\image.gif -d`  
   
 ## Просмотр заголовков
 - Просмотр основной информации о gif-файле, а также информации о загловках для каждого кадра анимации.  
@@ -28,7 +28,7 @@ CLI приложение, позволяющее просматривать за
   
 
 - Пример:  
-    - `python gif_parser_interface.py -H Test\Images\image.gif`  
+    - `python gif_parser_interface.py Test\Images\image.gif -H`  
   
 ## Просмотр анимации  
 - Покадровая отрисовка анимации.  
@@ -38,7 +38,7 @@ CLI приложение, позволяющее просматривать за
   
 
 - Пример:  
-    - `python gif_parser_interface.py -a Test\Images\image.gif`
+    - `python gif_parser_interface.py Test\Images\image.gif -a`
  
 ## Экспорт кадров (всех или выбранных) в отдельные файлы  
 - Экспорт кадров в отдельные файлы. При вводе команды кадры анимации будут экспортированы в файлы формата png.
@@ -49,6 +49,6 @@ CLI приложение, позволяющее просматривать за
   
 
 - Пример:  
-    - `python gif_parser_interface.py -e Test\Images\transparent.gif` - экспорт всех кадров,
-    - `python gif_parser_interface.py -e 1 2 5 Test\Images\transparent.gif` - экспорт кадров 1, 2 и 5.
+    - `python gif_parser_interface.py Test\Images\transparent.gif -e` - экспорт всех кадров,
+    - `python gif_parser_interface.py Test\Images\transparent.gif -e 1 2 5` - экспорт кадров 1, 2 и 5.
  
