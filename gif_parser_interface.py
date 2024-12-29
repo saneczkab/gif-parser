@@ -4,6 +4,7 @@ import tkinter as tk
 
 from GifParser.gif_viewer import GifViewer
 from GifParser.gif_parser import GifParser
+from GifParser.gif_frames_exporter import GifFramesExporter
 
 
 def get_descriptor(parser):
@@ -36,6 +37,8 @@ def main():
     parser.add_argument("--descriptor", "-d", action="store_true", help="Показать дескриптор экрана")
     parser.add_argument("--headers", "-H", action="store_true", help="Показать заголовки для каждого кадра")
     parser.add_argument("--animate", "-a", action="store_true", help="Показать изображение/анимацию")
+    parser.add_argument("--export", "-e", nargs='*', type=int,
+                        help="Экспортировать кадры (все или отдельные, например: -e 1 2 5)")
     args = parser.parse_args()
     filepath = args.input
 
@@ -47,6 +50,13 @@ def main():
 
     if args.headers and gif_parser.header:
         logging.info(print_all_frames_headers(gif_parser))
+
+    if args.export is not None and gif_parser.frames:
+        exporter = GifFramesExporter(gif_parser)
+        if len(args.export) == 0:
+            exporter.export_all_frames()
+        else:
+            exporter.export_selected_frames(args.export)
 
     if args.animate and gif_parser.frames:
         root = tk.Tk()
